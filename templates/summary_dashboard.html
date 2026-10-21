@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Сводная статистика
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Сводная статистика</h1>
+{% include "components/filter.html" with title="Факультет" name="department" filter_id="departmentFilter" items=departments selected=selected_department %}
+
+{% include "components/chart_card.html" with title="Количество курсов по факультетам" chart_id="summaryCoursesByDepartmentChart" %}
+
+{{ courses_by_department|json_script:"summary-courses-department-data" }}
+
+{% include "components/chart_card.html" with title="Количество студентов по курсам" chart_id="summaryStudentsByCourseChart" %}
+
+{{ students_by_course|json_script:"summary-students-course-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    function createBarChart(chartId, dataId, labelField, datasetLabel) {
+        const data = JSON.parse(
+            document.getElementById(dataId).textContent
+        );
+
+        const labels = data.map(item => item[labelField]);
+        const values = data.map(item => item.total);
+
+        new Chart(document.getElementById(chartId), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: datasetLabel,
+                    data: values
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    createBarChart(
+        'summaryCoursesByDepartmentChart',
+        'summary-courses-department-data',
+        'department__name',
+        'Количество курсов'
+    );
+
+    createBarChart(
+        'summaryStudentsByCourseChart',
+        'summary-students-course-data',
+        'title',
+        'Количество студентов'
+    );
+</script>
+
+{% endblock %}

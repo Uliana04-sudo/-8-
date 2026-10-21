@@ -1,0 +1,26 @@
+<div class="mb-4">
+    <form method="get">
+        <label for="{{ filter_id }}" class="form-label">
+            {{ title }}
+        </label>
+
+        <select
+            name="{{ name }}"
+            id="{{ filter_id }}"
+            class="form-select"
+            onchange="this.form.submit()"
+        >
+            <option value="">Все</option>
+
+            {% for item in items %}
+                <option value="{{ item.id }}"
+                    {% if item.id|stringformat:"s" == selected|stringformat:"s" %}
+                        selected
+                    {% endif %}
+                >
+                    {{ item.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>

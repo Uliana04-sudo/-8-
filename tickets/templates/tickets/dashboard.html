@@ -1,0 +1,217 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+    <title>Управление заявками</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+<style>
+    body, .page {
+        background-color: #f4f2ff;
+    }
+    .container-xl {
+        max-width: 1100px;
+    }
+    h1 {
+        color: #27315b;
+        font-weight: 700;
+    }
+    .card {
+        border: 1px solid #e5e0fa;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(80, 65, 140, 0.08);
+        overflow: hidden;
+    }
+    .card-header {
+        background-color: #f9f8ff;
+    }
+    .card-title {
+        color: #27315b;
+        font-weight: 600;
+    }
+    .btn-primary {
+        background-color: #6e61cf;
+        border-color: #6e61cf;
+        border-radius: 8px;
+    }
+    .btn-primary:hover {
+        background-color: #574bb2;
+        border-color: #574bb2;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #9d91e9;
+        box-shadow: 0 0 0 3px rgba(110, 97, 207, 0.15);
+    }
+    .ticket-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+    }
+    .ticket-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .ticket-actions .form-select {
+        width: 180px;
+    }
+    .ticket-actions .btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+        width: auto;
+        padding: 8px 15px;
+        border-radius: 8px;
+    }
+    .ticket-actions .btn-primary {
+        background-color: #8844dc;
+        border-color: #8844dc;
+        color: white;
+    }
+    .ticket-actions .btn-danger {
+        background-color: #d63384;
+        border-color: #d63384;
+        color: white;
+    }
+    .ticket-actions .btn-danger:hover {
+        background-color: #b92a6f;
+        border-color: #b92a6f;
+    }
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        background: white;
+        border: 1px solid #e5d9fa;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(110, 97, 207, 0.08);
+        font-weight: 600;
+        color: #27315b;
+    }
+    .stat-circle {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        background: #ede2ff;
+        color: #7440c3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 25px;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+    .stat-circle.done {
+        background: #ffe0f0;
+        color: #ce398b;
+    }
+    .stat-card {
+        width: 100%;
+        cursor: pointer;
+        text-align: left;
+    }
+    .stat-card:hover {
+        border-color: #c99aee;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(180, 110, 210, 0.15);
+    }
+    .stat-card:focus-visible {
+        outline: 3px solid #d9b3f5;
+        outline-offset: 2px;
+    }
+
+</style>
+</head>
+
+<body>
+<div class="page">
+    <div class="page-wrapper">
+        <div class="container-xl py-4">
+            <h1 class="mb-4">Центр управления заявками</h1>
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <button type="button" class="stat-card" id="show-all">
+                        <span class="stat-circle" id="total-count">0</span>
+                        <span>Всего заявок</span>
+                    </button>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <button type="button" class="stat-card" id="show-done">
+                        <span class="stat-circle done" id="done-count">0</span>
+                        <span>Выполнено</span>
+                    </button>
+                </div>
+            </div>
+            {% csrf_token %}
+            <div id="message" role="status"
+                 aria-live="polite"></div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="ticket-form">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Название заявки
+                            </label>
+                            <input id="title"
+                                   class="form-control"
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Категория
+                            </label>
+                            <select id="category"
+                                    class="form-select"
+                                    required></select>
+                        </div>
+                        <button class="btn btn-primary"
+                                type="submit">
+                            Создать заявку
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Список заявок</h2>
+                </div>
+                <input type="search"
+                       id="ticket-search"
+                       class="form-control mb-3"
+                       placeholder="Поиск заявки...">
+                <div class="card-body">
+                    <select id="status-filter"
+                            class="form-select mb-3">
+                        <option value="">Все статусы</option>
+                        <option value="new">Новые</option>
+                        <option value="progress">В работе</option>
+                        <option value="done">Выполненные</option>
+                    </select>
+
+                    <div id="loading" hidden>
+                        Загрузка данных...
+                    </div>
+
+                    <div id="tickets-list"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+<script src="{% static 'tickets/app.js' %}"></script>
+</body>
+</html>

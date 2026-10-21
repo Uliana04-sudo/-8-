@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>
+        {% block title %}
+        Учебное приложение
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+
+    <!-- Tabler -->
+    <link rel="stylesheet"
+          href="{% static 'vendor/tabler/css/tabler.min.css' %}">
+
+    <link rel="stylesheet"
+          href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+
+        <a class="navbar-brand"
+           href="/profile/">
+            DjangoApp
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <div class="navbar-nav me-auto">
+
+
+            <a class="nav-link"
+   href="/profile/">
+    Профиль
+</a>
+
+<a class="nav-link"
+   href="/departments/">
+    Факультеты
+</a>
+
+<a class="nav-link"
+   href="/groups/">
+    Группы
+</a>
+
+<a class="nav-link"
+   href="/courses/">
+    Курсы
+</a>
+
+<a class="nav-link" href="/dashboard/">
+    Дашборд
+</a>
+
+<a class="nav-link" href="/courses-dashboard/">
+    Дашборд 2
+</a>
+
+<a class="nav-link" href="/groups-dashboard/">
+    Дашборд 3
+</a>
+
+<a class="nav-link" href="/departments-dashboard/">
+    Дашборд 4
+</a>
+
+<a class="nav-link" href="/summary-dashboard/">
+    Дашборд 5
+</a>
+        </div>
+
+        {% if user.is_authenticated %}
+
+    <span class="navbar-text me-3">
+        {{ user.username }}
+    </span>
+
+    <form method="post"
+          action="/accounts/logout/">
+
+        {% csrf_token %}
+
+        <button class="btn btn-outline-light btn-sm"
+                type="submit">
+            Выйти
+        </button>
+
+    </form>
+
+{% endif %}
+
+</div>
+
+</div>
+</nav>
+
+<div class="container page-container">
+
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}">
+</script>
+
+<!-- Tabler -->
+<script src="{% static 'vendor/tabler/js/tabler.min.js' %}">
+</script>
+
+</body>
+</html>

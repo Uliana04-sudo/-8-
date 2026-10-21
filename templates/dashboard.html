@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Дашборд
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Общая статистика</h1>
+{% include "components/filter.html" with title="Факультет" name="department" filter_id="departmentFilter" items=departments selected=selected_department %}
+
+<div class="row g-4">
+{% include "components/stat_card.html" with title="Факультеты" value=departments_count %}
+
+{% include "components/stat_card.html" with title="Курсы" value=courses_count %}
+
+{% include "components/stat_card.html" with title="Учебные группы" value=groups_count %}
+
+{% include "components/stat_card.html" with title="Пользователи" value=users_count %}
+</div>
+
+{% include "components/chart_card.html" with title="Количество курсов по факультетам" chart_id="coursesByDepartmentChart" %}
+{{ courses_by_department|json_script:"courses-data" }}
+
+{% include "components/chart_card.html" with title="Количество учебных групп по факультетам" chart_id="groupsByDepartmentChart" %}
+{{ groups_by_department|json_script:"groups-data" }}
+
+{% include "components/chart_card.html" with title="Количество студентов по факультетам" chart_id="studentsByDepartmentChart" %}
+{{ students_by_department|json_script:"students-data" }}
+
+{% include "components/chart_card.html" with title="Количество студентов по учебным группам" chart_id="studentsByGroupChart" %}
+{{ students_by_group|json_script:"students-group-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    function createBarChart(chartId, dataId, labelField, datasetLabel) {
+        const data = JSON.parse(
+            document.getElementById(dataId).textContent
+        );
+
+        const labels = data.map(item => item[labelField]);
+        const values = data.map(item => item.total);
+
+        new Chart(document.getElementById(chartId), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: datasetLabel,
+                    data: values
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    createBarChart(
+        'coursesByDepartmentChart',
+        'courses-data',
+        'department__name',
+        'Количество курсов'
+    );
+
+    createBarChart(
+        'groupsByDepartmentChart',
+        'groups-data',
+        'department__name',
+        'Количество учебных групп'
+    );
+
+    createBarChart(
+        'studentsByDepartmentChart',
+        'students-data',
+        'department__name',
+        'Количество студентов'
+    );
+
+    createBarChart(
+        'studentsByGroupChart',
+        'students-group-data',
+        'academic_group__name',
+        'Количество студентов'
+    );
+</script>
+
+{% endblock %}
