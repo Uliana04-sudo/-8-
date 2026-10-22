@@ -2,15 +2,31 @@ const csrfToken = document.querySelector(
     "[name=csrfmiddlewaretoken]"
 ).value;
 async function apiRequest(url, options = {}) {
-    const response = await fetch(url, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,
-            ...(options.headers || {})
-        },
-        credentials: "same-origin"
-    });
+
+    let response;
+
+    try {
+        response = await fetch(url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+                ...(options.headers || {})
+            },
+            credentials: "same-origin"
+        });
+    } catch {
+        throw new Error(
+            "Сервис временно недоступен. Попробуйте позже."
+        );
+    }
+
+    if (response.status >= 500) {
+        throw new Error(
+            "Сервис временно недоступен. Попробуйте позже."
+        );
+    }
+
     let data = null;
     if (response.status !== 204) {
         data = await response.json().catch(() => null);
